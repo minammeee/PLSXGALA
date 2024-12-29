@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sacrificio de PLS a Galactic</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <style>
+        /* Diseño global */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Contenedor principal */
+        .container {
+            background-color: #1c1c1c;
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #00b3ff;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: #b3b3b3;
+        }
+
+        .input-container {
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            padding: 12px;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background-color: #222;
+            color: #fff;
+            font-size: 1.1rem;
+            transition: border 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00b3ff;
+        }
+
+        /* Botones */
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00b3ff;
+            color: #fff;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0095cc;
+        }
+
+        button:disabled {
+            background-color: #888;
+            cursor: not-allowed;
+        }
+
+        /* Mensajes */
+        #statusMessage {
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            color: #00ff00;
+        }
+
+        /* Efectos de hover */
+        .btn-animated {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-animated:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(0, 179, 255, 0.3);
+            transition: all 0.4s ease;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: none;
+        }
+
+        .btn-animated:hover:after {
+            transform: translate(-50%, -50%) scale(0);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Sacrificio de PLS a Galactic</h1>
+    <p>Introduce la cantidad de PLS que deseas sacrificar y recibirás Galactic a cambio.</p>
+    
+    <div class="input-container">
+        <label for="sacrificioAmount">Cantidad a Sacrificar (en PLS):</label><br>
+        <input type="text" id="sacrificioAmount" placeholder="Ej. 10">
+    </div>
+    
+    <button id="connectWalletButton" class="btn-animated">Conectar Billetera</button>
+    <button id="sacrificarButton" class="btn-animated" disabled>Realizar Sacrificio</button>
+    
+    <p id="statusMessage"></p>
+</div>
+
+<script>
+    let web3;
+    let userAccount;
+    let sacrificioContractAddress = "0xYourSacrificioContractAddress"; // Dirección del contrato de sacrificio
+    let sacrificioContractABI = [
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "amountPLS",
+                    "type": "uint256"
+                }
+            ],
+            "name": "sacrificio",
+            "outputs": [],
+            "payable": true,
+            "stateMutability": "payable",
+            "type": "function"
+        }
+    ];
+
+    // Detectar billetera (MetaMask)
+    window.onload = async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            web3 = new Web3(window.ethereum);
+            document.getElementById('connectWalletButton').addEventListener('click', connectWallet);
+        } else {
+            alert('Por favor, instala MetaMask o usa una billetera compatible con PulseChain.');
+        }
+    };
+
+    // Conectar billetera
+    async function connectWallet() {
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            userAccount = accounts[0];
+            document.getElementById('statusMessage').textContent = "Billetera conectada: " + userAccount;
+            document.getElementById('sacrificarButton').disabled = false;
+        } catch (error) {
+            console.error("Error al conectar la billetera:", error);
+        }
+    }
+
+    // Realizar sacrificio
+    document.getElementById('sacrificarButton').addEventListener('click', async () => {
+        const amount = document.getElementById('sacrificioAmount').value;
+        if (!amount || isNaN(amount) || amount <= 0) {
+            alert("Por favor, ingresa una cantidad válida.");
+            return;
+        }
+
+        try {
+            const contract = new web3.eth.Contract(sacrificioContractABI, sacrificioContractAddress);
+            const amountInWei = web3.utils.toWei(amount, 'ether'); // Convertir la cantidad a la unidad mínima
+
+            // Llamar al método 'sacrificio' del contrato
+            const tx = await contract.methods.sacrificio(amountInWei).send({
+                from: userAccount,
+                value: amountInWei // Enviar el valor de PLS al contrato
+            });
+
+            document.getElementById('statusMessage').textContent = "Sacrificio realizado con éxito!";
+            console.log("Transacción exitosa:", tx);
+        } catch (error) {
+            console.error("Error al realizar el sacrificio:", error);
+            document.getElementById('statusMessage').textContent = "Hubo un error, intenta de nuevo.";
+        }
+    });
+</script>
+
+</body>
+</html>
