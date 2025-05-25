@@ -3,213 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sacrificio de PLS a Galactic</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <title>Calculadora de Pagos - Distrito Iconia</title>
     <style>
-        /* Diseño global */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #121212;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
+            background: url('https://via.placeholder.com/1920x1080?text=Fondo+Promodesa') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
         }
-
-        /* Contenedor principal */
-        .container {
-            background-color: #1c1c1c;
-            border-radius: 20px;
-            padding: 3rem 2rem;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        .calculator {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
             text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 150px;
+        }
+        h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input, select {
             width: 100%;
-            max-width: 450px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
         }
-
-        h1 {
-            font-size: 2rem;
-            color: #00b3ff;
-            margin-bottom: 1.5rem;
-            letter-spacing: 1px;
-        }
-
-        p {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-            color: #b3b3b3;
-        }
-
-        .input-container {
-            margin-bottom: 1.5rem;
-        }
-
-        input {
-            padding: 12px;
-            width: 100%;
-            max-width: 300px;
-            margin-top: 10px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background-color: #222;
-            color: #fff;
-            font-size: 1.1rem;
-            transition: border 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #00b3ff;
-        }
-
-        /* Botones */
         button {
-            padding: 12px 25px;
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
             border: none;
             border-radius: 5px;
-            background-color: #00b3ff;
-            color: #fff;
-            font-size: 1.1rem;
+            font-size: 18px;
             cursor: pointer;
-            margin-top: 1rem;
             transition: background-color 0.3s ease;
         }
-
         button:hover {
-            background-color: #0095cc;
+            background-color: #218838;
         }
-
-        button:disabled {
-            background-color: #888;
-            cursor: not-allowed;
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-
-        /* Mensajes */
-        #statusMessage {
-            margin-top: 2rem;
-            font-size: 1.1rem;
-            color: #00ff00;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
-
-        /* Efectos de hover */
-        .btn-animated {
-            position: relative;
-            overflow: hidden;
+        table, th, td {
+            border: 1px solid #ddd;
         }
-
-        .btn-animated:after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300%;
-            height: 300%;
-            background: rgba(0, 179, 255, 0.3);
-            transition: all 0.4s ease;
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(1);
-            pointer-events: none;
+        th, td {
+            padding: 10px;
+            text-align: left;
         }
-
-        .btn-animated:hover:after {
-            transform: translate(-50%, -50%) scale(0);
+        th {
+            background-color: #0056b3;
+            color: white;
         }
-
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
+    <div class="calculator">
+        <div class="logo">
+            <img src="https://via.placeholder.com/150x50?text=Logo+Promodesa" alt="Logo Promodesa">
+        </div>
+        <h2>Calculadora de Pagos - Distrito Iconia</h2>
+        <form id="paymentForm">
+            <label for="price">Precio del Departamento (MXN):</label>
+            <input type="number" id="price" placeholder="Ejemplo: 1000000" required>
 
-<div class="container">
-    <h1>Sacrificio de PLS a Galactic</h1>
-    <p>Introduce la cantidad de PLS que deseas sacrificar y recibirás Galactic a cambio.</p>
-    
-    <div class="input-container">
-        <label for="sacrificioAmount">Cantidad a Sacrificar (en PLS):</label><br>
-        <input type="text" id="sacrificioAmount" placeholder="Ej. 10">
+            <label for="plan">Selecciona el plan de pago:</label>
+            <select id="plan">
+                <option value="12">Contado (12 meses - 20% descuento)</option>
+                <option value="18">Semicontado (18 meses - 15% descuento)</option>
+            </select>
+
+            <button type="button" onclick="calculatePayments()">Calcular Pagos</button>
+        </form>
+
+        <div id="result"></div>
     </div>
-    
-    <button id="connectWalletButton" class="btn-animated">Conectar Billetera</button>
-    <button id="sacrificarButton" class="btn-animated" disabled>Realizar Sacrificio</button>
-    
-    <p id="statusMessage"></p>
-</div>
 
-<script>
-    let web3;
-    let userAccount;
-    let sacrificioContractAddress = "0xYourSacrificioContractAddress"; // Dirección del contrato de sacrificio
-    let sacrificioContractABI = [
-        {
-            "constant": false,
-            "inputs": [
-                {
-                    "name": "amountPLS",
-                    "type": "uint256"
-                }
-            ],
-            "name": "sacrificio",
-            "outputs": [],
-            "payable": true,
-            "stateMutability": "payable",
-            "type": "function"
+    <script>
+        function calculatePayments() {
+            // Obtener valores del formulario
+            const price = parseFloat(document.getElementById('price').value);
+            const plan = parseInt(document.getElementById('plan').value);
+
+            if (isNaN(price) || price <= 0) {
+                document.getElementById('result').innerHTML = "<p style='color: red;'>Por favor, ingresa un precio válido.</p>";
+                return;
+            }
+
+            let discountRate, downPaymentRate, months, downPayment, remainingBalance, monthlyPayment, totalAfterDiscount;
+
+            // Calcular según el plan seleccionado
+            if (plan === 12) {
+                discountRate = 0.20;
+                downPaymentRate = 0.50;
+                months = 12;
+            } else {
+                discountRate = 0.15;
+                downPaymentRate = 0.20;
+                months = 18;
+            }
+
+            // Aplicar descuento
+            totalAfterDiscount = price * (1 - discountRate);
+
+            // Calcular enganche
+            downPayment = totalAfterDiscount * downPaymentRate;
+
+            // Calcular saldo restante
+            remainingBalance = totalAfterDiscount - downPayment;
+
+            // Calcular mensualidades
+            monthlyPayment = remainingBalance / months;
+
+            // Generar tabla de resultados
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h3>Esquema de Pago</h3>
+                <table>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Monto (MXN)</th>
+                    </tr>
+                    <tr>
+                        <td>Precio original</td>
+                        <td>$${price.toLocaleString('es-MX')}</td>
+                    </tr>
+                    <tr>
+                        <td>Descuento (${discountRate * 100}%)</td>
+                        <td>$${(price * discountRate).toLocaleString('es-MX')}</td>
+                    </tr>
+                    <tr>
+                        <td>Precio con descuento</td>
+                        <td>$${totalAfterDiscount.toLocaleString('es-MX')}</td>
+                    </tr>
+                    <tr>
+                        <td>Enganche (${downPaymentRate * 100}%)</td>
+                        <td>$${downPayment.toLocaleString('es-MX')} (a pagar en los primeros 90 días)</td>
+                    </tr>
+                    <tr>
+                        <td>Saldo</td>
+                        <td>$${remainingBalance.toLocaleString('es-MX')}</td>
+                    </tr>
+                    <tr>
+                        <td>Mensualidades (${months} meses)</td>
+                        <td>$${monthlyPayment.toLocaleString('es-MX')} por mes</td>
+                    </tr>
+                </table>
+            `;
         }
-    ];
-
-    // Detectar billetera (MetaMask)
-    window.onload = async () => {
-        if (typeof window.ethereum !== 'undefined') {
-            web3 = new Web3(window.ethereum);
-            document.getElementById('connectWalletButton').addEventListener('click', connectWallet);
-        } else {
-            alert('Por favor, instala MetaMask o usa una billetera compatible con PulseChain.');
-        }
-    };
-
-    // Conectar billetera
-    async function connectWallet() {
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            userAccount = accounts[0];
-            document.getElementById('statusMessage').textContent = "Billetera conectada: " + userAccount;
-            document.getElementById('sacrificarButton').disabled = false;
-        } catch (error) {
-            console.error("Error al conectar la billetera:", error);
-        }
-    }
-
-    // Realizar sacrificio
-    document.getElementById('sacrificarButton').addEventListener('click', async () => {
-        const amount = document.getElementById('sacrificioAmount').value;
-        if (!amount || isNaN(amount) || amount <= 0) {
-            alert("Por favor, ingresa una cantidad válida.");
-            return;
-        }
-
-        try {
-            const contract = new web3.eth.Contract(sacrificioContractABI, sacrificioContractAddress);
-            const amountInWei = web3.utils.toWei(amount, 'ether'); // Convertir la cantidad a la unidad mínima
-
-            // Llamar al método 'sacrificio' del contrato
-            const tx = await contract.methods.sacrificio(amountInWei).send({
-                from: userAccount,
-                value: amountInWei // Enviar el valor de PLS al contrato
-            });
-
-            document.getElementById('statusMessage').textContent = "Sacrificio realizado con éxito!";
-            console.log("Transacción exitosa:", tx);
-        } catch (error) {
-            console.error("Error al realizar el sacrificio:", error);
-            document.getElementById('statusMessage').textContent = "Hubo un error, intenta de nuevo.";
-        }
-    });
-</script>
-
+    </script>
 </body>
 </html>
